@@ -1,0 +1,69 @@
+git:
+to find the last change in a given file since a given version:
+git blame a2c0ce44744039a365b61cc6f81e1528ee5b8478~1 -- py/strato/master/api/openstackapi/types.py
+git reflog - 
+git log -p origin/master..HEAD
+
+
+to create a patch:
+git diff commitid1 commitid2 > patch.txt
+
+After running the 'make' command - rpms are under ./build/
+
+python rpm extract:
+rpm2cpio ../strato_api-1-0.x86_64.rpm | cpio -idmv
+
+
+
+port forwarding:
+* show port forwarding table: sudo iptables-save 
+
+
+virt from cli:
+show all vms: virsh -c qemu:///system list --all
+show specific xml for vm: virsh -c qemu:///system dumpxml <name
+	example: virsh -c qemu:///system dumpxml strato-openstackcontroller-vanilla 
+
+
+Mount a vanila (like ISO)
+dc> ./env python /home/roei/roei/mount.py /home/roei/work/dc/vmclones/strato-openstackagent-vanilla.qcow2
+
+
+pullrequest:
+from dc: pullequest somename
+will create a new remote branch in dc: pullrequest_roei_somename_<timestamp>
+to remove this branch from the remote: git push origin :pullrequest_roei_somename_<timestamp>
+
+
+debugging python (shahar style):
+--------------------------------
+don't run dc/env
+run: UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH=py ipython
+start importing packages, use package __path__ & __file__ to investigate imported files
+
+
+libvirt:
+----------
+get VM list:
+  virsh -c qemu:///system
+start a VM:  
+  virsh -c qemu:///system start strato-vanialla
+turn off VM:
+  virsh -c qemu:///system shutdown strato-vanilla
+print the VM XML:
+  virsh -c qemu:///system dumpxml strato-vanilla
+
+
+
+On the controller:
+---------------------
+login: ssh root@192.168.122.254
+get permissions for cinder: source keystonerc_admin
+run cinder commands: cinder <>
+get nova list: nova list
+get list of images: glance image-list
+
+strato api - another interface before openstack
+open strato api console: strato-cli
+Create image volume:  volume-create-from source-type=image name=testImage, source-id=1a9f47d7-dcd0-46a9-8700-21b4a18274ff
+
