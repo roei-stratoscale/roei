@@ -80,10 +80,10 @@ class Test( scenario.Scenario ):
         self._restApiUrl = "http://%s:%d/%s" % ( controller.publicIP(), apiconfig.REST_PORT, apiconfig.REST_VERSION )
 
     def run( self ):
-	pdb.set_trace()
+        pdb.set_trace()
 
         """
-	self._checkNodeStats()
+        self._checkNodeStats()
         self._checkClusterStats()
         self._checkStorageClusterAPI()
         self._checkBackendsStats()
@@ -118,7 +118,7 @@ class Test( scenario.Scenario ):
         self._shutDownAgent1()
         self._verifyDeleteNodeAgent2()
         self._checkShutDownNotRunningServer()
-	"""
+    """
 
     def _sendRequestAndUpdateCookies( self, requestMethod, *args, **kws ):
         response = requestMethod( *args, cookies = self._cookies, **kws )

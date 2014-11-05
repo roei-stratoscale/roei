@@ -1,13 +1,26 @@
 git:
+-----
 to find the last change in a given file since a given version:
 git blame a2c0ce44744039a365b61cc6f81e1528ee5b8478~1 -- py/strato/master/api/openstackapi/types.py
 git reflog - 
 git log -p origin/master..HEAD
 
-
 to create a patch:
 git diff commitid1 commitid2 > patch.txt
 
+Define a new repository:
+
+    Add another remote origin named "roei":
+    git remote add roei https://github.com/roei-stratoscale/northbound.git
+    
+    !!!! FORCE push to the repository
+    git push -f roei HEAD:master
+
+    Push to a specific branch
+    git push roei HEAD:stratocli_changes
+
+RPMs:
+-------
 After running the 'make' command - rpms are under ./build/
 
 python rpm extract:
@@ -15,8 +28,37 @@ rpm2cpio ../strato_api-1-0.x86_64.rpm | cpio -idmv
 
 
 
+
+Network and HTTP:
+-----------------
 port forwarding:
 * show port forwarding table: sudo iptables-save 
+
+
+
+ssh tunneling: ssh -L <local port>:<remote ip from forwarded server>:<remote port from forwarded server> <forwarded server>
+  ssh -L 7000:192.168.122.254:7000 strato@rack02-server06  
+
+After ssh tunneling, you can run the cli locally (main.py uses port 7000):
+  ./env python ../northbound/py/strato/northbound/cli/main.py
+
+netstat:
+  netstat -a -n --tcp
+  netstat -l -n --tcp -p
+
+
+
+CURL:
+------
+From the controller:
+run the command to the restapi:
+  curl http://0.0.0.0:7000/v1/VMs
+
+create a new VM from REST:
+  curl http://localhost:7000/v1/VMs -d "name=shahar4&image-id=69e756e2-9c54-4a14-9b7b-268660e44827"
+  curl -X POST -v http://localhost:7000/v1/VMs?name=shahar11name=shahar10&image-id=69e756e2-9c54-4a14-9b7b
+
+
 
 
 virt from cli:
@@ -41,6 +83,17 @@ don't run dc/env
 run: UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH=py ipython
 start importing packages, use package __path__ & __file__ to investigate imported files
 
+
+unittests:
+------------
+run a single unittest (can add pdb to the unittest):
+for example, run the test_restfuladapter.py test in northbound/ : 
+STRATO_CONF_DIRECTORY=/etc/stratoscale UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH="py" python ../voodoo-mock/pytest/pytestrunner.py --cui `find . -name 'test_main*.py'`
+
+using rpdb:
+add: import rpdb; rpdb.set_trace()
+STRATO_CONF_DIRECTORY=/etc/stratoscale UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH=py:../consulate python ../voodoo-mock/pytest/pytestharness.py `find . -name 'test_stratocmd.py'`
+from another prompt: nc 127.0.0.1 4444
 
 libvirt:
 ----------
@@ -67,3 +120,6 @@ strato api - another interface before openstack
 open strato api console: strato-cli
 Create image volume:  volume-create-from source-type=image name=testImage, source-id=1a9f47d7-dcd0-46a9-8700-21b4a18274ff
 
+systemctl:
+-----------
+reload the deamon after installing new service rpm:  systemctl daemon-reload

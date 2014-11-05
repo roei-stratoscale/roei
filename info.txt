@@ -23,3 +23,7 @@ Menifast files in dc:
 
 pycharm:
 cntl+b - go to function definition
+
+unittests:
+find unittests: find . -name "test_*.py"
+To check a file <path>/<filename>.py - create a test <path>/tests/test_<filename>.py
