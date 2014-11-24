@@ -6,7 +6,7 @@ upseto - python imported dependency
 
 checkit: 
 from dc: checkit --noRebase --regex 100_unified roei_test_100_unified
-whatch under:
+watch under:
 http://stratojenkins:8080/
 
 username: stratotest
@@ -15,11 +15,6 @@ password: 2good2betruebettercallchucknorris
 run code review script:
 post-review -g
 
-Menifast files in dc:
-1. find the latest commit hash:
- - git log | head -1
-2. eddit the local manifest files:
- - grep -B 1 northbound ../dc/*.manifest
 
 pycharm:
 cntl+b - go to function definition

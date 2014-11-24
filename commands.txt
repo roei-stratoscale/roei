@@ -37,7 +37,8 @@ port forwarding:
 
 
 ssh tunneling: ssh -L <local port>:<remote ip from forwarded server>:<remote port from forwarded server> <forwarded server>
-  ssh -L 7000:192.168.122.254:7000 strato@rack02-server06  
+  ssh -L 3000:192.168.122.254:3000 strato@rack02-server05
+  ssh -L 7000:192.168.122.254:7000 strato@rack02-server05
 
 After ssh tunneling, you can run the cli locally (main.py uses port 7000):
   ./env python ../northbound/py/strato/northbound/cli/main.py
@@ -59,6 +60,9 @@ create a new VM from REST:
   curl -X POST -v http://localhost:7000/v1/VMs?name=shahar11name=shahar10&image-id=69e756e2-9c54-4a14-9b7b
 
 
+
+running racktests:
+from monkey:    make phystest REGEXP="--regex 200_concurrent_actions.py"
 
 
 virt from cli:
