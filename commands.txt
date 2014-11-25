@@ -127,3 +127,13 @@ Create image volume:  volume-create-from source-type=image name=testImage, sourc
 systemctl:
 -----------
 reload the deamon after installing new service rpm:  systemctl daemon-reload
+
+
+
+racktests:
+
+running a single racktest from monkey with ./env:
+make phystest REGEXP="--regex 200_"
+
+reading the logs nocely:
+/home/roei/work2/dc/sh/strato-log --noDebug ../monkey/logs.racktest/racktests.REST.200_concurrent_actions/test.stratolog | vim -
