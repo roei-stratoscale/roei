@@ -5,8 +5,16 @@ git blame a2c0ce44744039a365b61cc6f81e1528ee5b8478~1 -- py/strato/master/api/ope
 git reflog - 
 git log -p origin/master..HEAD
 
-to create a patch:
-git diff commitid1 commitid2 > patch.txt
+stuck git patch:
+This command will add the rebase "<<<<<<" signs:
+    patch -p1 --merge --no-backup-if-mismatch < 0001-BK-1119.patch
+
+afterwards, can run:
+    git add <modified file 1> <modified file 2> <modified file 3>
+
+and finally, run:
+    git am --resolve
+
 
 Define a new repository:
 
@@ -61,9 +69,20 @@ create a new VM from REST:
 
 
 
-running racktests:
+racktests:
+------------------
 from monkey:    make phystest REGEXP="--regex 200_concurrent_actions.py"
 
+to reade the logs nicely:
+sh/strato-log --noDebug logs.racktest/racktests.REST.200_concurrent_actions/test.stratolog
+To get list of nodes:
+sh/strato-log --noDebug logs.racktest/racktests.REST.200_concurrent_actions/test.stratolog | grep "Host allocated"
+
+to log in to a node with port 2079:
+/home/roei/work/pydonkey/tools/sshnode.py 2079
+
+copy a file to the rackattack provider (password: rackattack):
+scp -P 2079 build/rpms/* root@rackattack-provider:
 
 virt from cli:
 show all vms: virsh -c qemu:///system list --all
@@ -126,7 +145,9 @@ Create image volume:  volume-create-from source-type=image name=testImage, sourc
 
 systemctl:
 -----------
-reload the deamon after installing new service rpm:  systemctl daemon-reload
+reload the deamon after installing new service rpm:  
+systemctl daemon-reload
+systemctl --system daemon-reload
 
 
 
@@ -137,3 +158,10 @@ make phystest REGEXP="--regex 200_"
 
 reading the logs nocely:
 /home/roei/work2/dc/sh/strato-log --noDebug ../monkey/logs.racktest/racktests.REST.200_concurrent_actions/test.stratolog | vim -
+
+
+osmosis
+-------
+
+Check if osmosis (solvent) has a given lable:
+osmosis listlabels --objectStores=oberon:1010 | grep 2ba52c7d6a31f80baaa85e69c40c63ef1d784442
