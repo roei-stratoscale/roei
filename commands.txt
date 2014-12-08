@@ -139,15 +139,21 @@ run cinder commands: cinder <>
 get nova list: nova list
 get list of images: glance image-list
 
-strato api - another interface before openstack
-open strato api console: strato-cli
-Create image volume:  volume-create-from source-type=image name=testImage, source-id=1a9f47d7-dcd0-46a9-8700-21b4a18274ff
 
 systemctl:
 -----------
 reload the deamon after installing new service rpm:  
 systemctl daemon-reload
 systemctl --system daemon-reload
+
+check the service:
+rpm -qi strato_api
+
+check list of files per service:
+rpm -ql strato_api
+
+service file:
+rpm -ql strato_api | grep '.service$'
 
 
 
@@ -165,3 +171,7 @@ osmosis
 
 Check if osmosis (solvent) has a given lable:
 osmosis listlabels --objectStores=oberon:1010 | grep 2ba52c7d6a31f80baaa85e69c40c63ef1d784442
+
+Undo removed lable from the local osmosis:
+sudo osmosis checkout build/root solvent__rootfs-star__rootfs__2ba52c7d6a31f80baaa85e69c40c63ef1d784442__dirty
+sudo osmosis checkin build/root solvent__rootfs-star__rootfs__2ba52c7d6a31f80baaa85e69c40c63ef1d784442__dirty --objectStores oberon:1010
