@@ -175,3 +175,9 @@ osmosis listlabels --objectStores=oberon:1010 | grep 2ba52c7d6a31f80baaa85e69c40
 Undo removed lable from the local osmosis:
 sudo osmosis checkout build/root solvent__rootfs-star__rootfs__2ba52c7d6a31f80baaa85e69c40c63ef1d784442__dirty
 sudo osmosis checkin build/root solvent__rootfs-star__rootfs__2ba52c7d6a31f80baaa85e69c40c63ef1d784442__dirty --objectStores oberon:1010
+
+
+
+On the controler:
+------------------
+Nova client is under: /usr/lib/python2.7/site-packages/novaclient/
