@@ -139,6 +139,15 @@ run cinder commands: cinder <>
 get nova list: nova list
 get list of images: glance image-list
 
+Play with keystone mariaDB/mysql:
+login to mysql shell: 
+    KEYSTONE_PASSWORD is in /etc/keystone/ configuration file
+    mysql -ukeystone -pKEYSTONE_PASSWORD keystone
+
+
+
+
+
 
 systemctl:
 -----------
@@ -177,7 +186,36 @@ sudo osmosis checkout build/root solvent__rootfs-star__rootfs__2ba52c7d6a31f80ba
 sudo osmosis checkin build/root solvent__rootfs-star__rootfs__2ba52c7d6a31f80baaa85e69c40c63ef1d784442__dirty --objectStores oberon:1010
 
 
+How to change a rootfs in a not-ordinary way:
+------------------------------------------------
+
+find the rootfs you want. for example: solvent__rootfs-star__rootfs__3e4c995427600f20b7bc5b2accf5c5082a13b75d__official
+
+import rootfs from osmosis:
+roei@localhost~/work> sudo osmosis checkout eran-rootfs/ solvent__rootfs-star__rootfs__3e4c995427600f20b7bc5b2accf5c5082a13b75d__official --objectStores oberon:1010
+
+To change files:
+sudo chroot eran-rootfs
+
+exit chroot with cntl+d.
+
+sudo osmosis checkin eran-rootfs/ roei_best_rootfs_ever --MD5 --objectStores oberon:1010
+
+
+
+
 
 On the controler:
 ------------------
 Nova client is under: /usr/lib/python2.7/site-packages/novaclient/
+NOVA CLI command example: nova --os-username user110 --os-tenant-name tenant110 --os-password user110 --os-auth-url http://localhost:5000/v2.0/ flavor-list
+
+To change nova or other root-fs packages go to: work/distrato-yamls/yamls/pkgmeta and check the version. For example, to find out the default package of nova:
+roei@localhost~/work/distrato-yamls> grep binary_rpm -A 1 yamls/pkgmeta/openstack-nova.yaml | tail -1
+  - {filehash: 7289e6d65831bc1db79925a828a4b6c1, filename: openstack-nova-2014.1.2-1.s2.el7.centos.strato.98c2cf3b9748.noarch.rpm}
+
+Take the tag from the filename: "2014.1.2" and look it up in git on the nova repo:
+roei@localhost~/work/nova> git log -1 2014.1.2 | head -1
+commit 14080812961e5a2f6a7054a45d2afa013e4f3899
+
+

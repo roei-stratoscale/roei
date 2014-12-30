@@ -24,4 +24,4 @@ export PROMPT_COMMAND=prompt_command
 alias mys="ssh strato@rack02-server05"
 alias scpnorth="scp -r /home/roei/work/northbound/build/rpms/* strato@rack02-server05:work/dc/build/bring/northbound/"
 alias vimc="vim /home/roei/roei/commands.txt"
-
+alias sshnode="/home/roei/work/pydonkey/tools/sshnode.py"
