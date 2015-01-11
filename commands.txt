@@ -142,7 +142,7 @@ get list of images: glance image-list
 Play with keystone mariaDB/mysql:
 login to mysql shell: 
     KEYSTONE_PASSWORD is in /etc/keystone/ configuration file
-    mysql -ukeystone -pKEYSTONE_PASSWORD keystone
+    mysql -ukeystone -pKEYSTONE_PASSWORD keystone    # mysql -ukeystone -p044542c981cd253f1f6184b835a965eb keystone
 
 
 
@@ -219,3 +219,7 @@ roei@localhost~/work/nova> git log -1 2014.1.2 | head -1
 commit 14080812961e5a2f6a7054a45d2afa013e4f3899
 
 
+
+pip
+----
+To download a pip package: pip2tgz . rpdb
