@@ -37,6 +37,15 @@ rpm2cpio ../strato_api-1-0.x86_64.rpm | cpio -idmv
 
 
 
+MUI:
+--------------
+automatic monkey port forwarding:
+    port = self._controller.ssh.tunnel.localForwardMap()
+
+use in the port in the browser: 
+    127.0.0.1:port 
+
+
 Network and HTTP:
 -----------------
 port forwarding:
@@ -201,6 +210,9 @@ exit chroot with cntl+d.
 
 sudo osmosis checkin eran-rootfs/ roei_best_rootfs_ever --MD5 --objectStores oberon:1010
 
+osmosis transfer command (move object from one object store to another):
+osmosis transfer solvent__rootfs-star__config__3f5fc26f85e56dd75072fba0861a2f766a50e1a0__dirty --objectStores=oberon:1010 --transferDestination=osmosis.dc1.strato:1010
+
 
 
 
@@ -223,3 +235,26 @@ commit 14080812961e5a2f6a7054a45d2afa013e4f3899
 pip
 ----
 To download a pip package: pip2tgz . rpdb
+
+
+
+
+On the controler, run the services manually:
+
+  Glance:
+    systemctl stop openstack-glance-api.service
+    python /usr/bin/glance-api
+
+  Nova:
+    systemctl stop openstack-nova-api
+    python /usr/bin/nova-api
+
+  Strato-api:
+    systemctl stop strato-api
+    export PYTHONPATH=/usr/share/strato-api:$PYTHONPATH
+    export STRATO_LOGS_DIRECTORY=/var/log/stratoscale
+    export STRATO_CONF_DIRECTORY=/etc/stratoscale
+    export HOME=/root
+    export TMPDIR=/var/tmp
+    mkdir -p /mnt/nfs
+    python -m strato.northbound.api.main start

@@ -8,10 +8,11 @@ fi
 # User specific aliases and functions
 
 # Daily Tip - configuring your bash prompt
-function prompt_command {
-  export PS1=$($HOME/bin/bash_prompt)
-  }
-export PROMPT_COMMAND=prompt_command
+
+function _update_ps1() {
+    export PS1="$(~/powerline-shell.py $? 2> /dev/null)"
+}
+export PROMPT_COMMAND="_update_ps1; "
 
 
 #New Kremnitzer prompt:
