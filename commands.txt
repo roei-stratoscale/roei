@@ -102,6 +102,9 @@ show specific xml for vm: virsh -c qemu:///system dumpxml <name
 Mount a vanila (like ISO)
 dc> ./env python /home/roei/roei/mount.py /home/roei/work/dc/vmclones/strato-openstackagent-vanilla.qcow2
 
+ssh tunneling Posner style: (-fnN means run in background)
+sshpass -p rackattack ssh -o ServerAliveInterval=5 -o ServerAliveCountMax=1 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p 2099 root@rackattack-nat -L 8081:localhost:80 -fnN
+
 
 pullrequest:
 from dc: pullequest somename
@@ -116,16 +119,94 @@ run: UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH=py ipython
 start importing packages, use package __path__ & __file__ to investigate imported files
 
 
+
+
+egg files:
+list files:
+    unzip -l /usr/share/stratostorage/mancala_management_api.egg
+
+tar:
+    tar -I pigz -xvf nova-compute.gz
+
+import egg:
+>>> import sys
+>>> sys.path.append('/usr/share/stratostorage/mancala_management_api.egg')
+
+
+
+
 unittests:
 ------------
 run a single unittest (can add pdb to the unittest):
 for example, run the test_restfuladapter.py test in northbound/ : 
 STRATO_CONF_DIRECTORY=/etc/stratoscale UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH="py" python ../voodoo-mock/pytest/pytestrunner.py --cui `find . -name 'test_main*.py'`
 
+Now with printing the output:
+STRATO_CONF_DIRECTORY=/etc/stratoscale UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH="py" python ../voodoo-mock/pytest/pytestrunner.py --verbose ./py/strato/northbound/cli/tests/test_cli_help_output.py
+
 using rpdb:
 add: import rpdb; rpdb.set_trace()
 STRATO_CONF_DIRECTORY=/etc/stratoscale UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH=py:../consulate python ../voodoo-mock/pytest/pytestharness.py `find . -name 'test_stratocmd.py'`
 from another prompt: nc 127.0.0.1 4444
+
+
+whitebox test:
+--------------
+In harbour:
+UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH=py:py/strato:../openstackapi/testing ../pywhiteboxtest/runner --regex whiteboxtest/2_db_test.py
+
+Hourbour unittest:
+-------------------
+UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH=py:py/strato python -m unittest discover py/ -p "test_metadata.py"
+
+
+harbour debugging:
+-------------------
+add the following line to /etc/hosts:
+127.0.0.1 harbourd.service.strato
+
+stop the service:
+    systemctl stop harbourd
+or if that doesn't work: 
+    pkill -9 uwsgi
+remove the "file" line from the configuration config:
+/etc/harbour/uwsgi.conf
+
+
+run manually:
+PYTHONPATH=$PYTHONPATH:/usr/share/strato/harbour/ STRATO_CONF_DIRECTORY=/etc/stratoscale/ STRATO_LOGS_DIRECTORY=/var/log/stratoscale STRATO_LOGS_CONFIGURATION_FILE=/usr/share/strato/harbour/logconf.json  HOME=/root /usr/bin/uwsgi --ini /etc/harbour/uwsgi.conf --honour-stdin
+
+copy rpms:
+mkdir rpms; ssh-keygen; ssh-copy-id roei@10.0.1.212; scp -r roei@10.0.1.212:/home/roei/work/northbound/build/rpms/* roei@10.0.1.212:/home/roei/work/harbour/build/rpm/* ./rpms; yum reinstall rpms/* -y
+scp -r roei@10.0.1.212:/home/roei/work/northbound/build/rpms/* roei@10.0.1.212:/home/roei/work/harbour/build/rpm/* ./rpms; yum reinstall rpms/* -y
+
+
+Shahar gdb python process debuging:
+-----------------------------------
+Download the python debug info rpm:
+yum install -y wget; wget http://buildlogs.centos.org/c7.00.04/python/20140617165351/2.7.5-16.el7.x86_64/python-debuginfo-2.7.5-16.el7.x86_64.rpm; yum install -y python-debuginfo-2.7.5-16.el7.x86_64.rpm;
+
+run gdb on the process:
+gdb -p <process number>
+
+inside gdb:
+show thread info:
+    thread info 
+show treads backtrace:
+    thread apply all backtrace
+
+
+Put backtrace into a file:
+    echo 'thread apply all backtrace' > gdb_commands.txt
+    gdb -p 10587 -batch -x gdb_commands.txt > output.txt
+
+
+
+
+mancala:
+--------
+mancala volumes list
+
 
 libvirt:
 ----------
@@ -189,6 +270,7 @@ osmosis
 
 Check if osmosis (solvent) has a given lable:
 osmosis listlabels --objectStores=oberon:1010 | grep 2ba52c7d6a31f80baaa85e69c40c63ef1d784442
+osmosis listlabels --objectStores=osmosis.dc1.strato:1010 | grep f8e337b2eebb41f9fcf8c53fb6d596b521f6f385
 
 Undo removed lable from the local osmosis:
 sudo osmosis checkout build/root solvent__rootfs-star__rootfs__2ba52c7d6a31f80baaa85e69c40c63ef1d784442__dirty
@@ -258,3 +340,9 @@ On the controler, run the services manually:
     export TMPDIR=/var/tmp
     mkdir -p /mnt/nfs
     python -m strato.northbound.api.main start
+
+
+FTP:
+images ftp:
+    ftp images.dc1
+    uesername and password = images
