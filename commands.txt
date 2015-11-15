@@ -63,8 +63,17 @@ After ssh tunneling, you can run the cli locally (main.py uses port 7000):
 netstat:
   netstat -a -n --tcp
   netstat -l -n --tcp -p
+  netstat -a -n -p
 
 
+pep8 & pylint:
+../strato-pylint/pep8.sh ./py/strato/harbour/managers/servers.py
+UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH=py:build/bring/hammock/hammock-0.0.1-py2.7.egg:build/packages/usr/lib/python2.7/site-packages/:build/bring/strato_kv/strato_kv.egg ../strato-pylint/pylint.sh ./py/strato/harbour/managers/servers.py
+
+
+RABBIT:
+list messages:
+rabbitmqctl list_queues -p / messages memory name consumers | grep stratonode17417
 
 CURL:
 ------
@@ -120,19 +129,40 @@ start importing packages, use package __path__ & __file__ to investigate importe
 
 
 
+Copy grad egg:
+ssh-keygen; ssh-copy-id roei@10.0.1.212; scp -r roei@10.0.1.212:/home/roei/work/abacus/build/loadbalancer_nova_filter.egg /usr/share/strato-loadbalancer/loadbalancer_nova_filter.egg
+
 
 egg files:
+-----------
 list files:
     unzip -l /usr/share/stratostorage/mancala_management_api.egg
 
+Show specific file:
+    unzip -p /usr/share/stratostorage/mancala_management_api.egg mancala/management/melet/externalapi/volumes.py | less
+
 tar:
     tar -I pigz -xvf nova-compute.gz
+
+    open:
+-    tar -zxvf data.tar.gz -C <dirname>
+    list:
+-    tar -tzvf data.tar.gz
+    
 
 import egg:
 >>> import sys
 >>> sys.path.append('/usr/share/stratostorage/mancala_management_api.egg')
 
 
+
+Cluster Manager:
+----------------
+disable distributor:
+    curl -X 'PUT'  http://127.0.0.1:8500/v1/kv/servicedistributor/enabled -d 'false'
+
+undo:
+    curl -X 'PUT'  http://127.0.0.1:8500/v1/kv/servicedistributor/enabled -d 'false'
 
 
 unittests:
@@ -157,7 +187,7 @@ UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH=py:py/strato:../openstackapi/testin
 
 Hourbour unittest:
 -------------------
-UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH=py:py/strato python -m unittest discover py/ -p "test_metadata.py"
+UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH=py:py/strato python -m unittest discover py/ -p "test_servermetadata.py"
 
 
 harbour debugging:
@@ -180,6 +210,41 @@ copy rpms:
 mkdir rpms; ssh-keygen; ssh-copy-id roei@10.0.1.212; scp -r roei@10.0.1.212:/home/roei/work/northbound/build/rpms/* roei@10.0.1.212:/home/roei/work/harbour/build/rpm/* ./rpms; yum reinstall rpms/* -y
 scp -r roei@10.0.1.212:/home/roei/work/northbound/build/rpms/* roei@10.0.1.212:/home/roei/work/harbour/build/rpm/* ./rpms; yum reinstall rpms/* -y
 
+
+
+Harbour client:
+---------------
+python code:
+
+from harbour import harbour_client
+client = harbour_client.HarbourClient("harbourd.service.strato", 7070)
+
+strato_id = client.vms.get_strato_id(internal_id=nova_instance_id)
+spec = client.vms.get_spec(workload_id=strato_id)
+
+mysql:
+Set number of connections:
+MariaDB [(none)]> SHOW GLOBAL VARIABLES LIKE '%max_connection%';
+MariaDB [(none)]> SET GLOBAL max_connections=1000;
+
+
+
+NRAD:
+Working set size: VM Memory usage at a single defined time unit
+Working set change ration: What percentage of the working set changed in a single time unit (what percentage of the working set size was read from the disk)
+Resident set size: The memory a VM actually takes
+
+GRAD:
+stats:
+    parseGradDatatypes -q
+
+Lior:
+grepjson -i /var/log/stratoscale/runtime.grad.stratolog -l -m warning -n
+
+tests:
+make beztest REGEX=--regex=18
+
+UPSETO_JOIN_PYTHON_NAMESPACES=yes PYTHONPATH=$PYTHONPATH:py python -m unittest nova_weigher
 
 Shahar gdb python process debuging:
 -----------------------------------
@@ -218,6 +283,10 @@ turn off VM:
   virsh -c qemu:///system shutdown strato-vanilla
 print the VM XML:
   virsh -c qemu:///system dumpxml strato-vanilla
+
+  virsh list
+
+  virsh dumpxml instance-00000003 | less
 
 
 
@@ -272,8 +341,10 @@ Check if osmosis (solvent) has a given lable:
 osmosis listlabels --objectStores=oberon:1010 | grep 2ba52c7d6a31f80baaa85e69c40c63ef1d784442
 osmosis listlabels --objectStores=osmosis.dc1.strato:1010 | grep f8e337b2eebb41f9fcf8c53fb6d596b521f6f385
 
+get a lable from osmosis:
+sudo osmosis checkout build/root solvent__rootfs-star__rootfs__f02728ca2de19fe58ba28d671e24ad2ed4bde9fc__clean --objectStores osmosis.dc1.strato:1010
+
 Undo removed lable from the local osmosis:
-sudo osmosis checkout build/root solvent__rootfs-star__rootfs__2ba52c7d6a31f80baaa85e69c40c63ef1d784442__dirty
 sudo osmosis checkin build/root solvent__rootfs-star__rootfs__2ba52c7d6a31f80baaa85e69c40c63ef1d784442__dirty --objectStores oberon:1010
 
 
@@ -318,6 +389,10 @@ pip
 ----
 To download a pip package: pip2tgz . rpdb
 
+PEP8, flask8:
+get camelCase issues:
+flake8 --select=N803,N802,N806 py/strato/harbour/managers/*
+
 
 
 
@@ -329,6 +404,8 @@ On the controler, run the services manually:
 
   Nova:
     systemctl stop openstack-nova-api
+    add to /etc/hosts:
+        127.0.0.1 openstack-nova-api.service.strato
     python /usr/bin/nova-api
 
   Strato-api:
